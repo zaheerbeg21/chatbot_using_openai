@@ -1,0 +1,17 @@
+#pip install transformers torch
+
+from transformers import AutoModelForCausalLM, AutoTokenizer
+
+model_name = "gpt2"
+model = AutoModelForCausalLM.from_pretrained(model_name)
+tokenizer = AutoTokenizer.from_pretrained(model_name)
+
+def generate_response(user_input):
+    input_ids = tokenizer.encode(user_input + tokenizer.eos_token, return_tensors='pt')
+    bot_output = model.generate(input_ids, max_length=1000, pad_token_id=tokenizer.eos_token_id)
+    bot_response = tokenizer.decode(bot_output[0], skip_special_tokens=True)
+    return bot_response
+while True:
+    user_input = input("You: ")
+    bot_response = generate_response(user_input)
+    print("Chatbot:", bot_response)

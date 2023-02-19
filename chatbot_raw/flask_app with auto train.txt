@@ -1,0 +1,42 @@
+pip install transformers
+pip install torch
+pip install sentencepiece
+pip install Flask
+pip install flask-cors
+
+from transformers import pipeline
+
+chatbot = pipeline('text-generation', model='gpt2')
+
+response = chatbot('Hello, how are you?')
+print(response[0]['generated_text'])
+
+from flask import Flask, request, jsonify
+from transformers import pipeline
+
+app = Flask(__name__)
+chatbot = pipeline('text-generation', model='gpt2')
+
+@app.route('/chatbot', methods=['POST'])
+def chat():
+    user_message = request.json['user_message']
+    response = chatbot(user_message)
+    return jsonify(response[0]['generated_text'])
+
+if __name__ == '__main__':
+    app.run()
+
+-------------------- auto_train.py-----------
+import csv
+
+chatbot = pipeline('text-generation', model='gpt2')
+
+def train_chatbot(file_path):
+    with open(file_path, 'r') as f:
+        reader = csv.reader(f)
+        for row in reader:
+            user_message = row[0]
+            chatbot_response = row[1]
+            chatbot(user_message, chatbot_response)
+
+train_chatbot('data.csv')
